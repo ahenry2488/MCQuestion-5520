@@ -10,20 +10,25 @@ Still need
 - Radio Button style
 
 
-*/
-
+ */
 package com.mcapp;
 
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
+import com.gluonhq.impl.charm.a.b.b.s;
+import java.io.BufferedReader;
 import java.io.DataInputStream;
 import java.io.File;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStream;
+import java.io.InputStreamReader;
+import java.net.URL;
+import java.net.URLConnection;
 import java.util.ArrayList;
+import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
@@ -38,18 +43,20 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
+import static jdk.nashorn.internal.objects.ArrayBufferView.buffer;
 
 public class BasicView extends View {
+
     static ArrayList<String> questionResult = new ArrayList<String>(100);
     static ArrayList<String> choiceResult = new ArrayList<String>(100);
     static ArrayList<String> answerResult = new ArrayList<String>(100);
-    
+
     //Chapter numbers List for drop Down menu
-        static ObservableList<String> chList = FXCollections.observableArrayList();
-        //List to store the number of sections
-        static ObservableList<String> sList = FXCollections.observableArrayList();
-        //List to store the number of questions
-        static ObservableList<String> qList = FXCollections.observableArrayList();
+    static ObservableList<String> chList = FXCollections.observableArrayList();
+    //List to store the number of sections
+    static ObservableList<String> sList = FXCollections.observableArrayList();
+    //List to store the number of questions
+    static ObservableList<String> qList = FXCollections.observableArrayList();
 
     FlowPane flowPane = new FlowPane();
     ScrollPane scrollPane = new ScrollPane();
@@ -57,6 +64,8 @@ public class BasicView extends View {
     static String chapterNumber;
     static String sectionNumber;
     static String qNumber;
+    static String answerHint;
+    static String answerVal;
 
     public BasicView(String name) {
         super(name);
@@ -68,15 +77,15 @@ public class BasicView extends View {
         scrollPane.setContent(flowPane);
         setCenter(scrollPane);
     }
+
     public VBox home() {
-        
 
         //generate a list of strings from 1 to 40 for chapter choice
         for (int i = 1; i <= 44; i++) {
             String str = Integer.toString(i);
             chList.add(str);
         }
-                
+
         Label prompt = new Label("Please Choose Chapter Section and Question");
         prompt.setAlignment(Pos.CENTER);
 
@@ -123,18 +132,32 @@ public class BasicView extends View {
         getQuestions(val);
         getChoices(val);
         String Ans = getAnswers(val);
+
+        if (Ans.contains(" ")) {
+            answerVal = Ans.substring(0, Ans.indexOf(' '));
+            answerHint = Ans.substring(Ans.indexOf(' ') + 1);
+        } else {
+            answerVal = Ans;
+        }
+
         System.out.println("Answer is: " + Ans.trim());
 
         Label qPrompt = new Label(questionResult.get(0));
         qPrompt.setPrefWidth(200);
         qPrompt.setWrapText(true);
-        
+
         Label labelresponse = new Label();
         labelresponse.setPrefWidth(200);
         labelresponse.setWrapText(true);
 
+        Label labelHint = new Label();
+        labelHint.setPrefWidth(200);
+        labelHint.setWrapText(true);
+
         Button button = new Button("Submit");
         Button btHome = new Button("Try Again");
+        Button btHint = new Button("Hint");
+        btHint.setVisible(false);
 
         RadioButton radio1, radio2, radio3, radio4, radio5;
 
@@ -203,25 +226,31 @@ public class BasicView extends View {
         radio5.setOnAction(e -> button.setDisable(false));
 
         button.setOnAction(e -> {
-            if (radio1.isSelected() && (Ans.substring(0, 2).contains(radio1.getText().substring(0, 1)))) {
-                labelresponse.setText("Correct! answer is: " + Ans);
+            if (radio1.isSelected() && answerVal.contains(radio1.getText().substring(0, 1))) {
+                labelresponse.setText("Correct!");
                 button.setDisable(true);
-            } else if (radio2.isSelected() && (Ans.substring(0, 2).contains(radio2.getText().substring(0, 1)))) {
-                labelresponse.setText("Correct! answer is: " + Ans);
+            } else if (radio2.isSelected() && answerVal.contains(radio2.getText().substring(0, 1))) {
+                labelresponse.setText("Correct!");
                 button.setDisable(true);
-            } else if (radio3.isSelected() && (Ans.substring(0, 2).contains(radio3.getText().substring(0, 1)))) {
-                labelresponse.setText("Correct! answer is: " + Ans);
+            } else if (radio3.isSelected() && answerVal.contains(radio3.getText().substring(0, 1))) {
+                labelresponse.setText("Correct!");
                 button.setDisable(true);
-            } else if (radio4.isSelected() && (Ans.substring(0, 2).contains(radio4.getText().substring(0, 1)))) {
-                labelresponse.setText("Correct! answer is: " + Ans);
+            } else if (radio4.isSelected() && answerVal.contains(radio4.getText().substring(0, 1))) {
+                labelresponse.setText("Correct!");
                 button.setDisable(true);
-            } else if (radio5.isSelected() && (Ans.substring(0, 2).contains(radio5.getText().substring(0, 1)))) {
-                labelresponse.setText("Correct! answer is: " + Ans);
+            } else if (radio5.isSelected() && answerVal.contains(radio5.getText().substring(0, 1))) {
+                labelresponse.setText("Correct!");
                 button.setDisable(true);
             } else {
                 labelresponse.setText("Wrong answer");
                 button.setDisable(true);
+                btHint.setVisible(true);
+
             }
+        }
+        );
+        btHint.setOnAction(e -> {
+            labelHint.setText(answerHint);
         }
         );
         btHome.setOnAction(e -> {
@@ -232,7 +261,7 @@ public class BasicView extends View {
         }
         );
         VBox layout = new VBox(5);
-        layout.getChildren().addAll(qPrompt, radio1, radio2, radio3, radio4, radio5, button, labelresponse, btHome);
+        layout.getChildren().addAll(qPrompt, radio1, radio2, radio3, radio4, radio5, button, labelresponse, btHome, btHint, labelHint);
         layout.setPadding(new Insets(15, 15, 15, 70));
         layout.setAlignment(Pos.CENTER_LEFT);
         qScrollPane.setContent(layout);
@@ -246,13 +275,7 @@ public class BasicView extends View {
         System.out.println("Answer number" + answerNumber);
         System.out.println("chapter number" + chapterNumber);
 
-        //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt");
-        File f = new File("C:\\Users\\Owner\\Documents\\mc questions\\chapter" + chapterNumber + ".txt");
-        InputStream fis = new FileInputStream(f);
-        byte[] buffer = new byte[(int) f.length()];
-        new DataInputStream(fis).readFully(buffer);
-        fis.close();
-        String s = new String(buffer, "UTF-8");
+        String s = new Scanner(new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt").openStream(), "UTF-8").useDelimiter("\\A").next();
         //split into array
         String[] arr = s.split("\n");
 
@@ -274,13 +297,9 @@ public class BasicView extends View {
 
     private static ArrayList<String> getQuestions(String questionNumber) throws FileNotFoundException, IOException {
         //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt");
-        File f = new File("C:\\Users\\Owner\\Documents\\mc questions\\chapter" + chapterNumber + ".txt");
-        InputStream fis = new FileInputStream(f);
-        byte[] buffer = new byte[(int) f.length()];
-        new DataInputStream(fis).readFully(buffer);
-        fis.close();
-        String s = new String(buffer, "UTF-8");
-        //Split into array for processing
+        //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt");
+
+        String s = new Scanner(new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt").openStream(), "UTF-8").useDelimiter("\\A").next();
         String[] arr = s.split("\n");
 
         //Get question part
@@ -306,13 +325,9 @@ public class BasicView extends View {
     }
 
     private static ArrayList<String> getChoices(String questionNumber) throws FileNotFoundException, IOException {
-        //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt");
-        File f = new File("C:\\Users\\Owner\\Documents\\mc questions\\chapter" + chapterNumber + ".txt");
-        InputStream fis = new FileInputStream(f);
-        byte[] buffer = new byte[(int) f.length()];
-        new DataInputStream(fis).readFully(buffer);
-        fis.close();
-        String s = new String(buffer, "UTF-8");
+
+        String s = new Scanner(new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt").openStream(), "UTF-8").useDelimiter("\\A").next();
+
         //Split into array for processing
         String[] arr = s.split("\n");
 
@@ -337,19 +352,37 @@ public class BasicView extends View {
                 }
             }
         }
-
         System.out.println("------------question choices: ---------------");
         for (String i : choiceResult) {
             System.out.print(i + "\n ");
         }
         return choiceResult;
     }
-    
+
     @Override
     protected void updateAppBar(AppBar appBar) {
         appBar.setNavIcon(MaterialDesignIcon.MENU.button(e -> System.out.println("Menu")));
         appBar.setTitleText("CSCI-5520 Project 1");
         appBar.getActionItems().add(MaterialDesignIcon.SEARCH.button(e -> System.out.println("Search")));
+    }
+
+    public static String getText(String url) throws Exception {
+        URL website = new URL(url);
+        URLConnection connection = website.openConnection();
+        BufferedReader in = new BufferedReader(
+                new InputStreamReader(
+                        connection.getInputStream()));
+
+        StringBuilder response = new StringBuilder();
+        String inputLine;
+
+        while ((inputLine = in.readLine()) != null) {
+            response.append(inputLine);
+        }
+
+        in.close();
+
+        return response.toString();
     }
 
 }
