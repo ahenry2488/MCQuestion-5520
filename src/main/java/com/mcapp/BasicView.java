@@ -6,8 +6,6 @@ Still need
     - user login and upload result
 - Insets left 
 - Radio Button style
-
-
  */
 package com.mcapp;
 
@@ -18,6 +16,7 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -29,6 +28,7 @@ import javafx.geometry.Pos;
 import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
+import javafx.scene.control.ListCell;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
@@ -57,6 +57,8 @@ public class BasicView extends View {
     static String answerHint;
     static String answerVal;
     static String[] arr;
+    static String[] sectionArr;
+    static int sectionNum;
 
     public BasicView(String name) {
         super(name);
@@ -71,42 +73,95 @@ public class BasicView extends View {
 
     public VBox home() {
 
-        //generate a list of strings from 1 to 40 for chapter choice
+        //generate a list of strings from 1 to 44 for chapter choice
         for (int i = 1; i <= 44; i++) {
             String str = Integer.toString(i);
             chList.add(str);
         }
 
-        Label prompt = new Label("Please Choose Chapter Section and Question");
+        Label prompt = new Label("      Please Choose Chapter, Section and Question");
         prompt.setAlignment(Pos.CENTER);
 
         Label chLabel = new Label("");
 
-        ComboBox<String> chapter = new ComboBox(chList);
-        chapter.setEditable(false);
+        ComboBox chapter = new ComboBox(chList);
+        //chapter.setEditable(false);
         chapter.setPrefWidth(110);
         chapter.setPromptText("Chapter");
+        
+
+        chapter.setCellFactory(p -> new ListCell<String>() {
+
+            private String item;
+
+            {
+                setOnSwipeDown(e -> chapter.setValue(item));
+                setOnMouseClicked(e -> chapter.getSelectionModel().select(item));
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                this.item = item;
+                setText(item);
+
+            }
+
+        });
 
         Label sLabel = new Label("");
-        ComboBox<String> section = new ComboBox(chList);
-        section.setEditable(false);
+        ComboBox section = new ComboBox(chList);
+        //section.setEditable(false);
         section.setPrefWidth(110);
         section.setPromptText("Section");
 
+        section.setCellFactory(p -> new ListCell<String>() {
+
+            private String item;
+
+            {
+                setOnMousePressed(e -> section.getSelectionModel().select(item));
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                this.item = item;
+                setText(item);
+            }
+
+        });
+
         Label qLabel = new Label("");
-        ComboBox<String> question = new ComboBox(chList);
-        question.setEditable(false);
+        ComboBox question = new ComboBox(chList);
+        //question.setEditable(false);
         question.setPrefWidth(110);
         question.setPromptText("Question");
+        question.setCellFactory(p -> new ListCell<String>() {
+
+            private String item;
+
+            {
+                setOnMousePressed(e -> question.getSelectionModel().select(item));
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                this.item = item;
+                setText(item);
+            }
+
+        });
 
         Button btConfirm = new Button();
         btConfirm.setText("Choose Question");
 
         btConfirm.setOnAction(e -> {
-            try {                
-                chapterNumber = chapter.getValue();
+            try {
+                chapterNumber = chapter.getValue().toString();
                 arr = getText();
-                setCenter(generateQuestion(question.getValue()));
+                setCenter(generateQuestion(question.getValue().toString()));
 
             } catch (IOException ex) {
                 Logger.getLogger(BasicView.class.getName()).log(Level.SEVERE, null, ex);
@@ -137,7 +192,7 @@ public class BasicView extends View {
         System.out.println("Answer is: " + Ans.trim());
 
         Label qPrompt = new Label(questionResult.get(0));
-        qPrompt.setPrefWidth(200);
+        qPrompt.setPrefWidth(300);
         qPrompt.setWrapText(true);
 
         Label labelresponse = new Label();
@@ -255,12 +310,13 @@ public class BasicView extends View {
             choiceResult.clear();
             answerVal = "";
             answerHint = "";
+            sectionNum = 0;
             setCenter(scrollPane);
         }
         );
         VBox layout = new VBox(5);
         layout.getChildren().addAll(qPrompt, radio1, radio2, radio3, radio4, radio5, button, labelresponse, btHome, btHint, labelHint);
-        layout.setPadding(new Insets(15, 15, 15, 70));
+        layout.setPadding(new Insets(15, 15, 15, 15));
         layout.setAlignment(Pos.CENTER_LEFT);
         qScrollPane.setContent(layout);
         return qScrollPane;
@@ -270,8 +326,8 @@ public class BasicView extends View {
         int aNumber = Integer.parseInt(answerNumber);
 
         System.out.println("-------------------Location---------------------");
-        System.out.println("Answer number" + answerNumber);
-        System.out.println("chapter number" + chapterNumber);
+        System.out.println("Answer number " + answerNumber);
+        System.out.println("chapter number " + chapterNumber);
 
         for (int i = 0; i < arr.length; i++) {
             if (arr[i].startsWith("Key") || arr[i].startsWith("key")) {
@@ -285,7 +341,6 @@ public class BasicView extends View {
         String result = answerResult.get(aNumber - 1);
         return result;
     }
-////////////////////////////////////////////////////////////////////////////////
 
     private static ArrayList<String> getQuestions(String questionNumber) throws FileNotFoundException, IOException, Exception {
         //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt"); 
@@ -349,7 +404,9 @@ public class BasicView extends View {
     }
 
     public static String[] getText() throws Exception {
-        URL url = new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt");
+        //http://php.wilhsy867.s156.eatj.com/mcquestions/chapter1.txt
+        //URL url = new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt");
+        URL url = new URL("http://php.wilhsy867.s156.eatj.com/mcquestions/chapter" + chapterNumber + ".txt");
         String inputLine;
 
         ArrayList<String> arr = new ArrayList<String>();
@@ -357,6 +414,9 @@ public class BasicView extends View {
                 new InputStreamReader(url.openStream()))) {
             while ((inputLine = in.readLine()) != null) {
                 arr.add(inputLine);
+                if (inputLine.startsWith("Section") || inputLine.startsWith("section")) {
+                    sectionNum++;
+                }
             }
         }
         String[] arr2 = arr.toArray(new String[arr.size()]);
