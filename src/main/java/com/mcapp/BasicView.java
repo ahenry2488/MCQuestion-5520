@@ -16,14 +16,9 @@ package com.mcapp;
 import com.gluonhq.charm.glisten.control.AppBar;
 import com.gluonhq.charm.glisten.mvc.View;
 import com.gluonhq.charm.glisten.visual.MaterialDesignIcon;
-import com.gluonhq.impl.charm.a.b.b.s;
 import java.io.BufferedReader;
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.FileNotFoundException;
 import java.io.IOException;
-import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.net.URL;
 import java.net.URLConnection;
@@ -43,7 +38,7 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import static jdk.nashorn.internal.objects.ArrayBufferView.buffer;
+import sun.misc.IOUtils;
 
 public class BasicView extends View {
 
@@ -244,7 +239,9 @@ public class BasicView extends View {
             } else {
                 labelresponse.setText("Wrong answer");
                 button.setDisable(true);
-                btHint.setVisible(true);
+                if (answerHint != null && answerHint != "") {
+                    btHint.setVisible(true);
+                }
 
             }
         }
@@ -257,6 +254,8 @@ public class BasicView extends View {
             questionResult.clear();
             answerResult.clear();
             choiceResult.clear();
+            answerVal = "";
+            answerHint = "";
             setCenter(scrollPane);
         }
         );
@@ -298,8 +297,9 @@ public class BasicView extends View {
     private static ArrayList<String> getQuestions(String questionNumber) throws FileNotFoundException, IOException {
         //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt");
         //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt");
-
-        String s = new Scanner(new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt").openStream(), "UTF-8").useDelimiter("\\A").next();
+        URL url = new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt");
+        String s = new Scanner(url.openStream(), "UTF-8").useDelimiter("\\A").next();       
+        
         String[] arr = s.split("\n");
 
         //Get question part
