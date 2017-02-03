@@ -270,8 +270,8 @@ public class BasicView extends View {
         int aNumber = Integer.parseInt(answerNumber);
 
         System.out.println("-------------------Location---------------------");
-        System.out.println("Answer number" + answerNumber);
-        System.out.println("chapter number" + chapterNumber);
+        System.out.println("Answer number " + answerNumber);
+        System.out.println("chapter number " + chapterNumber);
 
         for (int i = 0; i < arr.length; i++) {
             if (arr[i].startsWith("Key") || arr[i].startsWith("key")) {
