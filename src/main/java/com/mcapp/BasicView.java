@@ -4,8 +4,6 @@ Still need
 - section and question dropbox length accurate and load on chapter choice
 - database access 
     - user login and upload result
-    - access MC files from DB
-- Hint printout
 - Insets left 
 - Radio Button style
 
@@ -21,9 +19,7 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
-import java.net.URLConnection;
 import java.util.ArrayList;
-import java.util.Scanner;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 import javafx.collections.FXCollections;
@@ -38,7 +34,6 @@ import javafx.scene.control.ScrollPane;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
-import sun.misc.IOUtils;
 
 public class BasicView extends View {
 
@@ -61,6 +56,7 @@ public class BasicView extends View {
     static String qNumber;
     static String answerHint;
     static String answerVal;
+    static String[] arr;
 
     public BasicView(String name) {
         super(name);
@@ -84,34 +80,37 @@ public class BasicView extends View {
         Label prompt = new Label("Please Choose Chapter Section and Question");
         prompt.setAlignment(Pos.CENTER);
 
-        Label chLabel = new Label("Chapter");
+        Label chLabel = new Label("");
 
         ComboBox<String> chapter = new ComboBox(chList);
         chapter.setEditable(false);
-        chapter.setPrefWidth(75);
-        chapter.setValue(chList.get(0));
+        chapter.setPrefWidth(110);
+        chapter.setPromptText("Chapter");
 
-        Label sLabel = new Label("Section");
+        Label sLabel = new Label("");
         ComboBox<String> section = new ComboBox(chList);
         section.setEditable(false);
-        section.setPrefWidth(75);
-        section.getSelectionModel().selectFirst();
+        section.setPrefWidth(110);
+        section.setPromptText("Section");
 
-        Label qLabel = new Label("Question");
+        Label qLabel = new Label("");
         ComboBox<String> question = new ComboBox(chList);
         question.setEditable(false);
-        question.setPrefWidth(75);
-        question.getSelectionModel().selectFirst();
+        question.setPrefWidth(110);
+        question.setPromptText("Question");
 
         Button btConfirm = new Button();
         btConfirm.setText("Choose Question");
 
         btConfirm.setOnAction(e -> {
-            try {
+            try {                
                 chapterNumber = chapter.getValue();
+                arr = getText();
                 setCenter(generateQuestion(question.getValue()));
 
             } catch (IOException ex) {
+                Logger.getLogger(BasicView.class.getName()).log(Level.SEVERE, null, ex);
+            } catch (Exception ex) {
                 Logger.getLogger(BasicView.class.getName()).log(Level.SEVERE, null, ex);
             }
         });
@@ -122,7 +121,7 @@ public class BasicView extends View {
         return vb1;
     }
 
-    public ScrollPane generateQuestion(String val) throws IOException {
+    public ScrollPane generateQuestion(String val) throws IOException, Exception {
         ScrollPane qScrollPane = new ScrollPane();
         getQuestions(val);
         getChoices(val);
@@ -267,22 +266,16 @@ public class BasicView extends View {
         return qScrollPane;
     }
 
-    private static String getAnswers(String answerNumber) throws FileNotFoundException, IOException {
+    private static String getAnswers(String answerNumber) throws FileNotFoundException, IOException, Exception {
         int aNumber = Integer.parseInt(answerNumber);
 
         System.out.println("-------------------Location---------------------");
         System.out.println("Answer number" + answerNumber);
         System.out.println("chapter number" + chapterNumber);
 
-        String s = new Scanner(new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt").openStream(), "UTF-8").useDelimiter("\\A").next();
-        //split into array
-        String[] arr = s.split("\n");
-
         for (int i = 0; i < arr.length; i++) {
             if (arr[i].startsWith("Key") || arr[i].startsWith("key")) {
                 answerResult.add(arr[i].substring(4, arr[i].length()));
-//                String str = Integer.toString(i);
-//                qList.add(str);
             }
         }
         System.out.println("---------------Answer Result----------------");
@@ -294,20 +287,15 @@ public class BasicView extends View {
     }
 ////////////////////////////////////////////////////////////////////////////////
 
-    private static ArrayList<String> getQuestions(String questionNumber) throws FileNotFoundException, IOException {
-        //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt");
-        //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt");
-        URL url = new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt");
-        String s = new Scanner(url.openStream(), "UTF-8").useDelimiter("\\A").next();       
-        
-        String[] arr = s.split("\n");
-
+    private static ArrayList<String> getQuestions(String questionNumber) throws FileNotFoundException, IOException, Exception {
+        //File f = new File("C:\\Users\\WiLhS\\Desktop\\mcquestions\\chapter" + chapterNumber + ".txt"); 
         //Get question part
         String str = "";
         for (int i = 0; i < arr.length; i++) {
             if (arr[i].startsWith(questionNumber + ". ") || arr[i].startsWith(questionNumber + ".")) {
                 for (int j = i; j < arr.length; j++) {
                     str += arr[j];
+                    str += "\n";
                     if (arr[j + 1].startsWith("a.")) {
                         break;
                     }
@@ -324,13 +312,7 @@ public class BasicView extends View {
         return questionResult;
     }
 
-    private static ArrayList<String> getChoices(String questionNumber) throws FileNotFoundException, IOException {
-
-        String s = new Scanner(new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt").openStream(), "UTF-8").useDelimiter("\\A").next();
-
-        //Split into array for processing
-        String[] arr = s.split("\n");
-
+    private static ArrayList<String> getChoices(String questionNumber) throws FileNotFoundException, IOException, Exception {
         //Get Choices        
         for (int i = 0; i < arr.length; i++) {
             if (arr[i].startsWith(questionNumber + ".")) {
@@ -366,23 +348,20 @@ public class BasicView extends View {
         appBar.getActionItems().add(MaterialDesignIcon.SEARCH.button(e -> System.out.println("Search")));
     }
 
-    public static String getText(String url) throws Exception {
-        URL website = new URL(url);
-        URLConnection connection = website.openConnection();
-        BufferedReader in = new BufferedReader(
-                new InputStreamReader(
-                        connection.getInputStream()));
-
-        StringBuilder response = new StringBuilder();
+    public static String[] getText() throws Exception {
+        URL url = new URL("http://web-students.armstrong.edu/~ws8578/mcquestions/chapter" + chapterNumber + ".txt");
         String inputLine;
 
-        while ((inputLine = in.readLine()) != null) {
-            response.append(inputLine);
+        ArrayList<String> arr = new ArrayList<String>();
+        try (BufferedReader in = new BufferedReader(
+                new InputStreamReader(url.openStream()))) {
+            while ((inputLine = in.readLine()) != null) {
+                arr.add(inputLine);
+            }
         }
+        String[] arr2 = arr.toArray(new String[arr.size()]);
 
-        in.close();
-
-        return response.toString();
+        return arr2;
     }
 
 }
