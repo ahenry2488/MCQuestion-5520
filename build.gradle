@@ -7,6 +7,7 @@ buildscript {
     }
     dependencies {
         classpath 'org.javafxports:jfxmobile-plugin:1.3.2'
+        //classpath 'org.javafxports:jfxmobile-plugin:1.4.0'
         
     }
 }
@@ -70,7 +71,8 @@ jfxmobile {
                 'javax.annotations.**.*',
                 'javax.inject.**.*',
                 'javax.json.**.*',
-                'org.glassfish.json.**.*'
+                'org.glassfish.json.**.*',
+                'ensemble.**.*'
         ]
     }
 }

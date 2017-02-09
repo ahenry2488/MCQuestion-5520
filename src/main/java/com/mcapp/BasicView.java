@@ -16,7 +16,6 @@ import java.io.BufferedReader;
 import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
-import java.net.MalformedURLException;
 import java.net.URL;
 import java.util.ArrayList;
 import java.util.logging.Level;
@@ -31,6 +30,8 @@ import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
+import javafx.scene.control.Spinner;
+import javafx.scene.control.SpinnerValueFactory;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.FlowPane;
 import javafx.scene.layout.VBox;
@@ -58,7 +59,8 @@ public class BasicView extends View {
     static String answerVal;
     static String[] arr;
     static String[] sectionArr;
-    static int sectionNum;
+    static int numSections;
+    static int numQuestions = 1;
 
     public BasicView(String name) {
         super(name);
@@ -85,17 +87,17 @@ public class BasicView extends View {
         Label chLabel = new Label("");
 
         ComboBox chapter = new ComboBox(chList);
-        //chapter.setEditable(false);
         chapter.setPrefWidth(110);
+        chapter.getStyleClass().add(qNumber);
         chapter.setPromptText("Chapter");
-        
+        //chapter.setEditable(true);
 
         chapter.setCellFactory(p -> new ListCell<String>() {
-
             private String item;
 
             {
-                setOnSwipeDown(e -> chapter.setValue(item));
+                //setOnTouchPressed(e -> chapter.getSelectionModel().select(item));
+                //setOnSwipeDown(e -> chapter.setValue(item));
                 setOnMouseClicked(e -> chapter.getSelectionModel().select(item));
             }
 
@@ -104,14 +106,11 @@ public class BasicView extends View {
                 super.updateItem(item, empty);
                 this.item = item;
                 setText(item);
-
             }
-
         });
 
         Label sLabel = new Label("");
         ComboBox section = new ComboBox(chList);
-        //section.setEditable(false);
         section.setPrefWidth(110);
         section.setPromptText("Section");
 
@@ -120,7 +119,8 @@ public class BasicView extends View {
             private String item;
 
             {
-                setOnMousePressed(e -> section.getSelectionModel().select(item));
+                //setOnTouchPressed(e -> section.getSelectionModel().select(item));
+                //setOnMousePressed(e -> section.getSelectionModel().select(item));
             }
 
             @Override
@@ -133,27 +133,40 @@ public class BasicView extends View {
         });
 
         Label qLabel = new Label("");
-        ComboBox question = new ComboBox(chList);
-        //question.setEditable(false);
-        question.setPrefWidth(110);
-        question.setPromptText("Question");
-        question.setCellFactory(p -> new ListCell<String>() {
+        //-----------------------------------------------------------
+        final Spinner<String> question = new Spinner<String>();
+        //question.setSkin(value);
+        question.setMinHeight(50);
+        question.setMaxWidth(75);
+        question.setEditable(true);
+        //question.getStyleClass().add(question.STYLE_CLASS_ARROWS_ON_RIGHT_HORIZONTAL);
 
-            private String item;
 
-            {
-                setOnMousePressed(e -> question.getSelectionModel().select(item));
-            }
+        // Value factory.
+        SpinnerValueFactory<String> valueFactory =  new SpinnerValueFactory.ListSpinnerValueFactory(chList);
+        question.setValueFactory(valueFactory);
 
-            @Override
-            protected void updateItem(String item, boolean empty) {
-                super.updateItem(item, empty);
-                this.item = item;
-                setText(item);
-            }
-
-        });
-
+        //-----------------------------------------------------------
+//        ComboBox question = new ComboBox(chList);
+//        question.setPrefWidth(110);
+//        question.setPromptText("Question");
+//        question.setCellFactory(p -> new ListCell<String>() {
+//
+//            private String item;
+//
+//            {
+//                //setOnTouchPressed(e -> question.getSelectionModel().select(item));
+//                //setOnMousePressed(e -> question.getSelectionModel().select(item));
+//            }
+//
+//            @Override
+//            protected void updateItem(String item, boolean empty) {
+//                super.updateItem(item, empty);
+//                this.item = item;
+//                setText(item);
+//            }
+//
+//        });
         Button btConfirm = new Button();
         btConfirm.setText("Choose Question");
 
@@ -310,7 +323,8 @@ public class BasicView extends View {
             choiceResult.clear();
             answerVal = "";
             answerHint = "";
-            sectionNum = 0;
+            numSections = 1;
+            numQuestions = 1;
             setCenter(scrollPane);
         }
         );
@@ -415,10 +429,17 @@ public class BasicView extends View {
             while ((inputLine = in.readLine()) != null) {
                 arr.add(inputLine);
                 if (inputLine.startsWith("Section") || inputLine.startsWith("section")) {
-                    sectionNum++;
+                    numSections++;
                 }
+
+                if (inputLine.startsWith("#")) {
+                    numQuestions++;
+                }
+
             }
         }
+        System.out.println("The number of questions in chapter " + chapterNumber + " is " + numQuestions);
+        System.out.println("The number of sections in chapter " + chapterNumber + " is " + numSections);
         String[] arr2 = arr.toArray(new String[arr.size()]);
 
         return arr2;
