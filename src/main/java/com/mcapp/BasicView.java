@@ -4,7 +4,6 @@ Still need
 - section and question dropbox length accurate and load on chapter choice
 - database access 
     - user login and upload result
-- Insets left 
 - Radio Button style
  */
 package com.mcapp;
@@ -17,6 +16,10 @@ import java.io.FileNotFoundException;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.net.URL;
+import java.sql.Connection;
+import java.sql.DriverManager;
+import java.sql.PreparedStatement;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.logging.Level;
 import java.util.logging.Logger;
@@ -28,19 +31,20 @@ import javafx.scene.control.Button;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
+import javafx.scene.control.PasswordField;
 import javafx.scene.control.RadioButton;
 import javafx.scene.control.ScrollPane;
-import javafx.scene.control.Spinner;
-import javafx.scene.control.SpinnerValueFactory;
+import javafx.scene.control.TextField;
 import javafx.scene.control.ToggleGroup;
 import javafx.scene.layout.FlowPane;
+import javafx.scene.layout.HBox;
 import javafx.scene.layout.VBox;
 
 public class BasicView extends View {
 
-    static ArrayList<String> questionResult = new ArrayList<String>(100);
-    static ArrayList<String> choiceResult = new ArrayList<String>(100);
-    static ArrayList<String> answerResult = new ArrayList<String>(100);
+    static ArrayList<String> questionResult = new ArrayList<String>();
+    static ArrayList<String> choiceResult = new ArrayList<String>();
+    static ArrayList<String> answerResult = new ArrayList<String>();
 
     //Chapter numbers List for drop Down menu
     static ObservableList<String> chList = FXCollections.observableArrayList();
@@ -51,6 +55,9 @@ public class BasicView extends View {
 
     FlowPane flowPane = new FlowPane();
     ScrollPane scrollPane = new ScrollPane();
+
+    static String userName;
+    static String passWord;
 
     static String chapterNumber;
     static String sectionNumber;
@@ -68,7 +75,8 @@ public class BasicView extends View {
         flowPane.setAlignment(Pos.TOP_CENTER);
         flowPane.setVgap(75);
         flowPane.setPrefWidth(175);
-        flowPane.getChildren().addAll(home());
+        //flowPane.getChildren().addAll(home());
+        flowPane.getChildren().addAll(loginScreen());
         scrollPane.setContent(flowPane);
         setCenter(scrollPane);
     }
@@ -108,19 +116,17 @@ public class BasicView extends View {
                 setText(item);
             }
         });
-
         Label sLabel = new Label("");
         ComboBox section = new ComboBox(chList);
         section.setPrefWidth(110);
         section.setPromptText("Section");
-
         section.setCellFactory(p -> new ListCell<String>() {
-
             private String item;
 
             {
                 //setOnTouchPressed(e -> section.getSelectionModel().select(item));
                 //setOnMousePressed(e -> section.getSelectionModel().select(item));
+                setOnMouseClicked(e -> chapter.getSelectionModel().select(item));
             }
 
             @Override
@@ -134,39 +140,32 @@ public class BasicView extends View {
 
         Label qLabel = new Label("");
         //-----------------------------------------------------------
-        final Spinner<String> question = new Spinner<String>();
-        //question.setSkin(value);
-        question.setMinHeight(50);
-        question.setMaxWidth(75);
-        question.setEditable(true);
+        //final Spinner<String> question = new Spinner<String>();
+        ComboBox question = new ComboBox(chList);
+        //question.setSkin(value);       
         //question.getStyleClass().add(question.STYLE_CLASS_ARROWS_ON_RIGHT_HORIZONTAL);
-
-
         // Value factory.
-        SpinnerValueFactory<String> valueFactory =  new SpinnerValueFactory.ListSpinnerValueFactory(chList);
-        question.setValueFactory(valueFactory);
+//        SpinnerValueFactory<String> valueFactory =  new SpinnerValueFactory.ListSpinnerValueFactory(chList);
+//        question.setValueFactory(valueFactory);        
+        question.setPrefWidth(110);
+        question.setPromptText("Question");
+        question.setCellFactory(p -> new ListCell<String>() {
+            private String item;
 
-        //-----------------------------------------------------------
-//        ComboBox question = new ComboBox(chList);
-//        question.setPrefWidth(110);
-//        question.setPromptText("Question");
-//        question.setCellFactory(p -> new ListCell<String>() {
-//
-//            private String item;
-//
-//            {
-//                //setOnTouchPressed(e -> question.getSelectionModel().select(item));
-//                //setOnMousePressed(e -> question.getSelectionModel().select(item));
-//            }
-//
-//            @Override
-//            protected void updateItem(String item, boolean empty) {
-//                super.updateItem(item, empty);
-//                this.item = item;
-//                setText(item);
-//            }
-//
-//        });
+            {
+                //setOnTouchPressed(e -> question.getSelectionModel().select(item));
+                //setOnMousePressed(e -> question.getSelectionModel().select(item));
+                setOnMouseClicked(e -> chapter.getSelectionModel().select(item));
+            }
+
+            @Override
+            protected void updateItem(String item, boolean empty) {
+                super.updateItem(item, empty);
+                this.item = item;
+                setText(item);
+            }
+
+        });
         Button btConfirm = new Button();
         btConfirm.setText("Choose Question");
 
@@ -186,6 +185,83 @@ public class BasicView extends View {
         vb1.setPadding(new Insets(15, 0, 0, 0));
         vb1.getChildren().addAll(prompt, chLabel, chapter, sLabel, section, qLabel, question, btConfirm);
         vb1.setAlignment(Pos.CENTER);
+        return vb1;
+    }
+
+    public VBox loginScreen() {
+        FlowPane loginPane = new FlowPane();
+        loginPane.setPrefWidth(200);
+        Label prompt = new Label();
+        prompt.setWrapText(true);
+        prompt.setAlignment(Pos.CENTER);
+        prompt.setPrefWidth(275);        
+        prompt.setText("\tThis will connect to your local sql DB \n\tChange line 235 to a relation in your DB \n\n\tIntro To JAVA 11th Ed.\n\tY. Daniel Liang");
+
+        Label Username = new Label();
+        Username.setPrefWidth(100);
+        Username.setText("User Name");
+
+        Label pWord = new Label();
+        pWord.setPrefWidth(100);
+        pWord.setText("Password");
+
+        TextField usrNameText = new TextField();
+        usrNameText.setPrefWidth(150);
+        usrNameText.setText("");
+        PasswordField  pWordText = new PasswordField ();
+        pWordText.setPrefWidth(150);
+        pWordText.setText("");
+
+        HBox usr = new HBox();
+        usr.setAlignment(Pos.CENTER);
+        usr.setPadding(new Insets(12, 12, 12, 12));
+        HBox pass = new HBox();
+        pass.setAlignment(Pos.CENTER);
+        pass.setPadding(new Insets(12, 12, 12, 12));
+        HBox submitButton = new HBox();
+        submitButton.setAlignment(Pos.CENTER);
+        submitButton.setPadding(new Insets(12, 12, 12, 12));
+
+        Button loginButton = new Button("Submit");
+
+        usr.getChildren().addAll(Username, usrNameText);
+        pass.getChildren().addAll(pWord, pWordText);
+        submitButton.getChildren().addAll(loginButton);
+        loginPane.getChildren().addAll(prompt, usr, pass, submitButton);
+        loginPane.setPadding(new Insets(100, 15, 15, 15));
+        loginPane.setAlignment(Pos.CENTER);
+
+        VBox vb1 = new VBox(25);
+        vb1.setPadding(new Insets(15, 0, 0, 0));
+        vb1.getChildren().addAll(loginPane);
+        vb1.setAlignment(Pos.CENTER);
+
+        loginButton.setOnAction(e -> {
+            if (pWordText.getText() != "" && usrNameText.getText() != "") {
+                try {
+                    userName = usrNameText.getText();
+                    passWord = pWordText.getText();
+                    String dBName = "student_records";
+                    PreparedStatement pstmt;
+                    // Load the JDBC driver
+                    Class.forName("com.mysql.jdbc.Driver");
+                    System.out.println("Driver loaded");
+                    // Establish a connection
+                    //Connection conn = DriverManager.getConnection("jdbc:mysql://localhost:3307/wilhsy867?autoReconnect=true", "wilhsy867", "310998007");
+                    Connection conn = DriverManager.getConnection("jdbc:mysql://localhost/" + dBName, userName, passWord);
+                    System.out.println("Database connected");
+                    //pstmt = conn.prepareStatement("INSERT INTO `scores` (`ch#`, `sec#`, `firstName`, `mI`, `address`, `city`, `state`, `telephone`) VALUES (" + ID + " , '" + lastName + "', '" + firstName + "', '" + mI + "', '" + address + "', '" + city + "', '" + state + "', '" + telephone + "')");
+                    //pstmt.executeUpdate();
+                    setCenter(home());
+                } catch (ClassNotFoundException ex) {                    
+                    prompt.setText( ex.getMessage());
+                } catch (SQLException ex) {                                      
+                    prompt.setText(ex.getMessage());
+                }
+            }
+            //setCenter(home());
+        }
+        );
         return vb1;
     }
 
@@ -325,6 +401,8 @@ public class BasicView extends View {
             answerHint = "";
             numSections = 1;
             numQuestions = 1;
+            flowPane.getChildren().clear();
+            flowPane.getChildren().addAll(home());
             setCenter(scrollPane);
         }
         );
