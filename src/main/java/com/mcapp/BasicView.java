@@ -28,6 +28,7 @@ import javafx.collections.ObservableList;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
 import javafx.scene.control.Button;
+import javafx.scene.control.CheckBox;
 import javafx.scene.control.ComboBox;
 import javafx.scene.control.Label;
 import javafx.scene.control.ListCell;
@@ -68,6 +69,7 @@ public class BasicView extends View {
     static String[] sectionArr;
     static int numSections;
     static int numQuestions = 1;
+    static String temp = "";
 
     public BasicView(String name) {
         super(name);
@@ -116,9 +118,7 @@ public class BasicView extends View {
                 setText(item);
             }
         });
-        
-        
-        
+
         Label sLabel = new Label("");
         ComboBox section = new ComboBox(chList);
         section.setPrefWidth(110);
@@ -126,11 +126,13 @@ public class BasicView extends View {
         //section.getSelectionModel().selectFirst();
         section.setCellFactory(p -> new ListCell<String>() {
             private String item;
+
             {
                 //setOnTouchPressed(e -> section.getSelectionModel().select(item));
                 //setOnMousePressed(e -> section.getSelectionModel().select(item));
                 //setOnMouseClicked(e -> section.getSelectionModel().select(item));
             }
+
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -188,13 +190,14 @@ public class BasicView extends View {
         return vb1;
     }
 //-----------------------------------------------------------------------------------------------------------
+
     public VBox loginScreen() {
         FlowPane loginPane = new FlowPane();
         loginPane.setPrefWidth(200);
         Label prompt = new Label();
         prompt.setWrapText(true);
         prompt.setAlignment(Pos.CENTER);
-        prompt.setPrefWidth(275);        
+        prompt.setPrefWidth(275);
         prompt.setText("\tThis will connect to your local sql DB \n\tChange line 235 to a relation in your DB \n\n\tIntro To JAVA Programming 11th Ed.\n\tY. Daniel Liang");
 
         Label Username = new Label();
@@ -208,7 +211,7 @@ public class BasicView extends View {
         TextField usrNameText = new TextField();
         usrNameText.setPrefWidth(150);
         usrNameText.setText("");
-        PasswordField  pWordText = new PasswordField ();
+        PasswordField pWordText = new PasswordField();
         pWordText.setPrefWidth(150);
         pWordText.setText("");
 
@@ -253,9 +256,9 @@ public class BasicView extends View {
                     //pstmt = conn.prepareStatement("INSERT INTO `scores` (`ch#`, `sec#`, `firstName`, `mI`, `address`, `city`, `state`, `telephone`) VALUES (" + ID + " , '" + lastName + "', '" + firstName + "', '" + mI + "', '" + address + "', '" + city + "', '" + state + "', '" + telephone + "')");
                     //pstmt.executeUpdate();
                     //setCenter(home());
-                } catch (ClassNotFoundException ex) {                    
+                } catch (ClassNotFoundException ex) {
                     prompt.setText(ex.getMessage());
-                } catch (SQLException ex) {                                      
+                } catch (SQLException ex) {
                     prompt.setText(ex.getMessage());
                 }
             }
@@ -277,141 +280,283 @@ public class BasicView extends View {
         } else {
             answerVal = Ans;
         }
-        String ansLength = Ans.trim();
+
         System.out.println("Answer is: " + Ans.trim());
-        
-        
 
-        Label qPrompt = new Label(questionResult.get(0));
-        qPrompt.setPrefWidth(300);
-        qPrompt.setWrapText(true);
+        System.out.println(answerVal.length());
 
-        Label labelresponse = new Label();
-        labelresponse.setPrefWidth(200);
-        labelresponse.setWrapText(true);
+        if (answerVal.length() > 1) {
 
-        Label labelHint = new Label();
-        labelHint.setPrefWidth(200);
-        labelHint.setWrapText(true);
+            Label qPrompt = new Label(questionResult.get(0));
+            qPrompt.setPrefWidth(300);
+            qPrompt.setWrapText(true);
 
-        Button button = new Button("Submit");
-        Button btHome = new Button("Try Again");
-        Button btHint = new Button("Hint");
-        btHint.setVisible(false);
+            Label labelresponse = new Label();
+            labelresponse.setPrefWidth(200);
+            labelresponse.setWrapText(true);
 
-        RadioButton radio1, radio2, radio3, radio4, radio5;
+            Label labelHint = new Label();
+            labelHint.setPrefWidth(200);
+            labelHint.setWrapText(true);
 
-        if (choiceResult.size() >= 1) {
-            radio1 = new RadioButton(choiceResult.get(0));
-        } else {
-            radio1 = new RadioButton("a.");
-            radio1.setDisable(true);
-        }
-        radio1.setPrefWidth(250);
-        radio1.setWrapText(true);
+            Button button = new Button("Submit");
+            Button btHome = new Button("Try Again");
+            Button btHint = new Button("Hint");
+            btHint.setVisible(false);
 
-        if (choiceResult.size() >= 2) {
-            radio2 = new RadioButton(choiceResult.get(1));
-        } else {
-            radio2 = new RadioButton("b.");
-            radio2.setDisable(true);
-        }
-        radio2.setPrefWidth(250);
-        radio2.setWrapText(true);
+            CheckBox box1, box2, box3, box4, box5;
 
-        if (choiceResult.size() >= 3) {
-            radio3 = new RadioButton(choiceResult.get(2));
-        } else {
-            radio3 = new RadioButton("c.");
-            radio3.setDisable(true);
-            radio3.setVisible(false);
-        }
-        radio3.setPrefWidth(250);
-        radio3.setWrapText(true);
+            RadioButton radio1, radio2, radio3, radio4, radio5;
 
-        if (choiceResult.size() >= 4) {
-            radio4 = new RadioButton(choiceResult.get(3));
-        } else {
-            radio4 = new RadioButton("d.");
-            radio4.setDisable(true);
-            radio4.setVisible(false);
-        }
-        radio4.setPrefWidth(250);
-        radio4.setWrapText(true);
-
-        if (choiceResult.size() >= 5) {
-            radio5 = new RadioButton(choiceResult.get(4));
-        } else {
-            radio5 = new RadioButton("e.");
-            radio5.setDisable(true);
-            radio5.setVisible(false);
-        }
-        radio5.setPrefWidth(250);
-        radio5.setWrapText(true);
-
-        ToggleGroup question = new ToggleGroup();
-
-        radio1.setToggleGroup(question);
-        radio2.setToggleGroup(question);
-        radio3.setToggleGroup(question);
-        radio4.setToggleGroup(question);
-        radio5.setToggleGroup(question);
-
-        button.setDisable(true);
-
-        radio1.setOnAction(e -> button.setDisable(false));
-        radio2.setOnAction(e -> button.setDisable(false));
-        radio3.setOnAction(e -> button.setDisable(false));
-        radio4.setOnAction(e -> button.setDisable(false));
-        radio5.setOnAction(e -> button.setDisable(false));
-
-        button.setOnAction(e -> {
-            if (radio1.isSelected() && answerVal.contains(radio1.getText().substring(0, 1))) {
-                labelresponse.setText("Correct!");
-                button.setDisable(true);
-            } else if (radio2.isSelected() && answerVal.contains(radio2.getText().substring(0, 1))) {
-                labelresponse.setText("Correct!");
-                button.setDisable(true);
-            } else if (radio3.isSelected() && answerVal.contains(radio3.getText().substring(0, 1))) {
-                labelresponse.setText("Correct!");
-                button.setDisable(true);
-            } else if (radio4.isSelected() && answerVal.contains(radio4.getText().substring(0, 1))) {
-                labelresponse.setText("Correct!");
-                button.setDisable(true);
-            } else if (radio5.isSelected() && answerVal.contains(radio5.getText().substring(0, 1))) {
-                labelresponse.setText("Correct!");
-                button.setDisable(true);
+            if (choiceResult.size() >= 1) {
+                box1 = new CheckBox(choiceResult.get(0));
             } else {
-                labelresponse.setText("Wrong answer");
-                button.setDisable(true);
-                if (answerHint != null && answerHint != "") {
-                    btHint.setVisible(true);
+                box1 = new CheckBox("a.");
+                box1.setDisable(true);
+            }
+            box1.setPrefWidth(250);
+            box1.setWrapText(true);
+
+            if (choiceResult.size() >= 2) {
+                box2 = new CheckBox(choiceResult.get(1));
+            } else {
+                box2 = new CheckBox("b.");
+                box2.setDisable(true);
+            }
+            box2.setPrefWidth(250);
+            box2.setWrapText(true);
+
+            if (choiceResult.size() >= 3) {
+                box3 = new CheckBox(choiceResult.get(2));
+            } else {
+                box3 = new CheckBox("c.");
+                box3.setDisable(true);
+                box3.setVisible(false);
+            }
+            box3.setPrefWidth(250);
+            box3.setWrapText(true);
+
+            if (choiceResult.size() >= 4) {
+                box4 = new CheckBox(choiceResult.get(3));
+            } else {
+                box4 = new CheckBox("d.");
+                box4.setDisable(true);
+                box4.setVisible(false);
+            }
+            box4.setPrefWidth(250);
+            box4.setWrapText(true);
+
+            if (choiceResult.size() >= 5) {
+                box5 = new CheckBox(choiceResult.get(4));
+            } else {
+                box5 = new CheckBox("e.");
+                box5.setDisable(true);
+                box5.setVisible(false);
+            }
+            box5.setPrefWidth(250);
+            box5.setWrapText(true);
+
+            //ToggleGroup question = new ToggleGroup();
+
+            button.setDisable(true);
+
+            box1.setOnAction(e -> button.setDisable(false));
+            box2.setOnAction(e -> button.setDisable(false));
+            box3.setOnAction(e -> button.setDisable(false));
+            box4.setOnAction(e -> button.setDisable(false));
+            box5.setOnAction(e -> button.setDisable(false));
+
+            button.setOnAction(e -> {
+                temp = "";
+                if (box1.isSelected()) {
+                    temp += "a";
+
+                }
+                if (box2.isSelected()) {
+                    temp += "b";
+
+                }
+                if (box3.isSelected()) {
+                    temp += "c";
+
+                }
+                if (box4.isSelected()) {
+                    temp += "d";
+
+                }
+                if (box5.isSelected()) {
+                    temp += "e";
+
+                }
+
+                System.out.println("TEMP " + temp);
+                System.out.println("ANSWVAL " + answerVal);
+                if (answerVal.contains(temp)) {
+                    labelresponse.setText("Correct!");
+                } else {
+                    labelresponse.setText("Wrong answer");
+                    button.setDisable(true);
+                    if (answerHint != null && answerHint != "") {
+                        btHint.setVisible(true);
+                    }
                 }
             }
+            );
+            btHint.setOnAction(e -> {
+                labelHint.setText(answerHint);
+            }
+            );
+            btHome.setOnAction(e -> {
+                questionResult.clear();
+                answerResult.clear();
+                choiceResult.clear();
+                answerVal = "";
+                answerHint = "";
+                numSections = 1;
+                numQuestions = 1;
+                flowPane.getChildren().clear();
+                flowPane.getChildren().addAll(home());
+                setCenter(scrollPane);
+            }
+            );
+            VBox layout = new VBox(5);
+            layout.getChildren().addAll(qPrompt, box1, box2, box3, box4, box5, button, labelresponse, btHome, btHint, labelHint);
+            layout.setPadding(new Insets(15, 15, 15, 15));
+            layout.setAlignment(Pos.CENTER_LEFT);
+            qScrollPane.setContent(layout);
+        } else {
+            Label qPrompt = new Label(questionResult.get(0));
+            qPrompt.setPrefWidth(300);
+            qPrompt.setWrapText(true);
+
+            Label labelresponse = new Label();
+            labelresponse.setPrefWidth(200);
+            labelresponse.setWrapText(true);
+
+            Label labelHint = new Label();
+            labelHint.setPrefWidth(200);
+            labelHint.setWrapText(true);
+
+            Button button = new Button("Submit");
+            Button btHome = new Button("Try Again");
+            Button btHint = new Button("Hint");
+            btHint.setVisible(false);
+
+            RadioButton radio1, radio2, radio3, radio4, radio5;
+
+            if (choiceResult.size() >= 1) {
+                radio1 = new RadioButton(choiceResult.get(0));
+            } else {
+                radio1 = new RadioButton("a.");
+                radio1.setDisable(true);
+            }
+            radio1.setPrefWidth(250);
+            radio1.setWrapText(true);
+
+            if (choiceResult.size() >= 2) {
+                radio2 = new RadioButton(choiceResult.get(1));
+            } else {
+                radio2 = new RadioButton("b.");
+                radio2.setDisable(true);
+            }
+            radio2.setPrefWidth(250);
+            radio2.setWrapText(true);
+
+            if (choiceResult.size() >= 3) {
+                radio3 = new RadioButton(choiceResult.get(2));
+            } else {
+                radio3 = new RadioButton("c.");
+                radio3.setDisable(true);
+                radio3.setVisible(false);
+            }
+            radio3.setPrefWidth(250);
+            radio3.setWrapText(true);
+
+            if (choiceResult.size() >= 4) {
+                radio4 = new RadioButton(choiceResult.get(3));
+            } else {
+                radio4 = new RadioButton("d.");
+                radio4.setDisable(true);
+                radio4.setVisible(false);
+            }
+            radio4.setPrefWidth(250);
+            radio4.setWrapText(true);
+
+            if (choiceResult.size() >= 5) {
+                radio5 = new RadioButton(choiceResult.get(4));
+            } else {
+                radio5 = new RadioButton("e.");
+                radio5.setDisable(true);
+                radio5.setVisible(false);
+            }
+            radio5.setPrefWidth(250);
+            radio5.setWrapText(true);
+
+            ToggleGroup question = new ToggleGroup();
+
+            radio1.setToggleGroup(question);
+            radio2.setToggleGroup(question);
+            radio3.setToggleGroup(question);
+            radio4.setToggleGroup(question);
+            radio5.setToggleGroup(question);
+
+            button.setDisable(true);
+
+            radio1.setOnAction(e -> button.setDisable(false));
+            radio2.setOnAction(e -> button.setDisable(false));
+            radio3.setOnAction(e -> button.setDisable(false));
+            radio4.setOnAction(e -> button.setDisable(false));
+            radio5.setOnAction(e -> button.setDisable(false));
+
+            button.setOnAction(e -> {
+                if (radio1.isSelected() && answerVal.contains(radio1.getText().substring(0, 1))) {
+                    labelresponse.setText("Correct!");
+                    button.setDisable(true);
+                } else if (radio2.isSelected() && answerVal.contains(radio2.getText().substring(0, 1))) {
+                    labelresponse.setText("Correct!");
+                    button.setDisable(true);
+                } else if (radio3.isSelected() && answerVal.contains(radio3.getText().substring(0, 1))) {
+                    labelresponse.setText("Correct!");
+                    button.setDisable(true);
+                } else if (radio4.isSelected() && answerVal.contains(radio4.getText().substring(0, 1))) {
+                    labelresponse.setText("Correct!");
+                    button.setDisable(true);
+                } else if (radio5.isSelected() && answerVal.contains(radio5.getText().substring(0, 1))) {
+                    labelresponse.setText("Correct!");
+                    button.setDisable(true);
+                } else {
+                    labelresponse.setText("Wrong answer");
+                    button.setDisable(true);
+                    if (answerHint != null && answerHint != "") {
+                        btHint.setVisible(true);
+                    }
+                }
+            }
+            );
+            btHint.setOnAction(e -> {
+                labelHint.setText(answerHint);
+            }
+            );
+            btHome.setOnAction(e -> {
+                questionResult.clear();
+                answerResult.clear();
+                choiceResult.clear();
+                answerVal = "";
+                answerHint = "";
+                numSections = 1;
+                numQuestions = 1;
+                flowPane.getChildren().clear();
+                flowPane.getChildren().addAll(home());
+                setCenter(scrollPane);
+            }
+            );
+            VBox layout = new VBox(5);
+            layout.getChildren().addAll(qPrompt, radio1, radio2, radio3, radio4, radio5, button, labelresponse, btHome, btHint, labelHint);
+            layout.setPadding(new Insets(15, 15, 15, 15));
+            layout.setAlignment(Pos.CENTER_LEFT);
+            qScrollPane.setContent(layout);
+
         }
-        );
-        btHint.setOnAction(e -> {
-            labelHint.setText(answerHint);
-        }
-        );
-        btHome.setOnAction(e -> {
-            questionResult.clear();
-            answerResult.clear();
-            choiceResult.clear();
-            answerVal = "";
-            answerHint = "";
-            numSections = 1;
-            numQuestions = 1;
-            flowPane.getChildren().clear();
-            flowPane.getChildren().addAll(home());
-            setCenter(scrollPane);
-        }
-        );
-        VBox layout = new VBox(5);
-        layout.getChildren().addAll(qPrompt, radio1, radio2, radio3, radio4, radio5, button, labelresponse, btHome, btHint, labelHint);
-        layout.setPadding(new Insets(15, 15, 15, 15));
-        layout.setAlignment(Pos.CENTER_LEFT);
-        qScrollPane.setContent(layout);
         return qScrollPane;
     }
 
