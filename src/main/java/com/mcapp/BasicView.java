@@ -116,10 +116,14 @@ public class BasicView extends View {
                 setText(item);
             }
         });
+        
+        
+        
         Label sLabel = new Label("");
         ComboBox section = new ComboBox(chList);
         section.setPrefWidth(110);
         section.setPromptText("Section");
+        //section.getSelectionModel().selectFirst();
         section.setCellFactory(p -> new ListCell<String>() {
             private String item;
 
@@ -135,9 +139,7 @@ public class BasicView extends View {
                 this.item = item;
                 setText(item);
             }
-
         });
-
         Label qLabel = new Label("");
         //-----------------------------------------------------------
         //final Spinner<String> question = new Spinner<String>();
@@ -195,7 +197,7 @@ public class BasicView extends View {
         prompt.setWrapText(true);
         prompt.setAlignment(Pos.CENTER);
         prompt.setPrefWidth(275);        
-        prompt.setText("\tThis will connect to your local sql DB \n\tChange line 235 to a relation in your DB \n\n\tIntro To JAVA 11th Ed.\n\tY. Daniel Liang");
+        prompt.setText("\tThis will connect to your local sql DB \n\tChange line 235 to a relation in your DB \n\n\tIntro To JAVA Programming 11th Ed.\n\tY. Daniel Liang");
 
         Label Username = new Label();
         Username.setPrefWidth(100);
@@ -254,7 +256,7 @@ public class BasicView extends View {
                     //pstmt.executeUpdate();
                     setCenter(home());
                 } catch (ClassNotFoundException ex) {                    
-                    prompt.setText( ex.getMessage());
+                    prompt.setText(ex.getMessage());
                 } catch (SQLException ex) {                                      
                     prompt.setText(ex.getMessage());
                 }
