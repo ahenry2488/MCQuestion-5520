@@ -126,13 +126,11 @@ public class BasicView extends View {
         //section.getSelectionModel().selectFirst();
         section.setCellFactory(p -> new ListCell<String>() {
             private String item;
-
             {
                 //setOnTouchPressed(e -> section.getSelectionModel().select(item));
                 //setOnMousePressed(e -> section.getSelectionModel().select(item));
-                setOnMouseClicked(e -> chapter.getSelectionModel().select(item));
+                setOnMouseClicked(e -> section.getSelectionModel().select(item));
             }
-
             @Override
             protected void updateItem(String item, boolean empty) {
                 super.updateItem(item, empty);
@@ -157,7 +155,7 @@ public class BasicView extends View {
             {
                 //setOnTouchPressed(e -> question.getSelectionModel().select(item));
                 //setOnMousePressed(e -> question.getSelectionModel().select(item));
-                setOnMouseClicked(e -> chapter.getSelectionModel().select(item));
+                setOnMouseClicked(e -> question.getSelectionModel().select(item));
             }
 
             @Override
@@ -189,7 +187,7 @@ public class BasicView extends View {
         vb1.setAlignment(Pos.CENTER);
         return vb1;
     }
-
+//-----------------------------------------------------------------------------------------------------------
     public VBox loginScreen() {
         FlowPane loginPane = new FlowPane();
         loginPane.setPrefWidth(200);
@@ -254,14 +252,14 @@ public class BasicView extends View {
                     System.out.println("Database connected");
                     //pstmt = conn.prepareStatement("INSERT INTO `scores` (`ch#`, `sec#`, `firstName`, `mI`, `address`, `city`, `state`, `telephone`) VALUES (" + ID + " , '" + lastName + "', '" + firstName + "', '" + mI + "', '" + address + "', '" + city + "', '" + state + "', '" + telephone + "')");
                     //pstmt.executeUpdate();
-                    setCenter(home());
+                    //setCenter(home());
                 } catch (ClassNotFoundException ex) {                    
                     prompt.setText(ex.getMessage());
                 } catch (SQLException ex) {                                      
                     prompt.setText(ex.getMessage());
                 }
             }
-            //setCenter(home());
+            setCenter(home());
         }
         );
         return vb1;
@@ -279,8 +277,10 @@ public class BasicView extends View {
         } else {
             answerVal = Ans;
         }
-
+        String ansLength = Ans.trim();
         System.out.println("Answer is: " + Ans.trim());
+        
+        
 
         Label qPrompt = new Label(questionResult.get(0));
         qPrompt.setPrefWidth(300);
@@ -387,7 +387,6 @@ public class BasicView extends View {
                 if (answerHint != null && answerHint != "") {
                     btHint.setVisible(true);
                 }
-
             }
         }
         );
