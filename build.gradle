@@ -26,12 +26,12 @@ repositories {
 mainClassName = 'com.mcapp.MCApp'
 
 dependencies {
-    compile 'com.gluonhq:charm:4.2.0'
+    compile 'com.gluonhq:charm:4.3.0'
     compile 'com.android.support:appcompat-v7:25.1.1'
     compile 'com.android.support:design:25.1.1'
     
     //Need this for combo box to work on android
-    // https://mvnrepository.com/artifact/com.gluonhq/charm-down-android
+    //https://mvnrepository.com/artifact/com.gluonhq/charm-down-android
     //compile group: 'com.gluonhq', name: 'charm-down-android', version: '2.0.0'
     compile group: 'org.javafxports', name: 'jfxdvk', version: '8.60.6'
 
@@ -41,14 +41,13 @@ dependencies {
 
 jfxmobile {
     downConfig {
-        version = '3.1.0'
+        version = '3.2.0'
         // Do not edit the line below. Use Gluon Mobile Settings in your project context menu instead
         plugins 'display', 'lifecycle', 'statusbar', 'storage'
     }
     android {
         applicationPackage = 'org.javafxports.ensemble'
         manifest = 'src/android/AndroidManifest.xml'
-        //buildToolsVersion = '25.2.5'
         buildToolsVersion = '25.0.2'
         packagingOptions {
             exclude 'META-INF/DEPENDENCIES.txt'

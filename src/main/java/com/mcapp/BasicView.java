@@ -129,7 +129,7 @@ public class BasicView extends View {
             {
                 //setOnTouchPressed(e -> section.getSelectionModel().select(item));
                 //setOnMousePressed(e -> section.getSelectionModel().select(item));
-                setOnMouseClicked(e -> section.getSelectionModel().select(item));
+                //setOnMouseClicked(e -> section.getSelectionModel().select(item));
             }
             @Override
             protected void updateItem(String item, boolean empty) {
